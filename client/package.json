@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "apollo-boost": "^0.4.3",
+    "babel-loader": "^8.0.5",
     "classnames": "^2.2.6",
     "graphql": "^14.4.2",
     "moment": "^2.24.0",
@@ -35,5 +36,6 @@
       "last 1 safari version"
     ],
     "proxy": "http://localhost:4000"
-  }
+  },
+  "devDependencies": {}
 }
