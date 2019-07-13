@@ -42,12 +42,9 @@ passport.use(new JWTStrategy({
     }, (jwtPayLoad, cb) => {
         return User.findOne({ _id: jwtPayLoad._id})
             .then(user => {
-                console.log(user);
                 return cb(null, user);
             })
             .catch(err => {
-                console.error(err);
-
                 return cb(err);
             })
     }

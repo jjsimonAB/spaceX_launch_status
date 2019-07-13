@@ -6,9 +6,22 @@ const { GraphQLObjectType,
         GraphQLSchema,
 } = require('graphql');
 
+const authController = require('./constrollers/auth');
+
 const axios = require('axios');
 
 // Lunch Type
+
+const UserType = new GraphQLObjectType({
+    name: 'User',
+    fields: () => ({
+        _id: { type: GraphQLString},
+        name: { type: GraphQLString },
+        email: { type: GraphQLString},
+        password: {type: GraphQLString},
+        status: {type: GraphQLString}
+    })
+})
 
 const LaunchType = new GraphQLObjectType({
     name: 'Launch',
@@ -70,6 +83,48 @@ const RootQuery = new GraphQLObjectType({
                 return axios.get(`https://api.spacexdata.com/v3/rockets/${args.id}`)
                     .then(res => res.data);
             }  
+        },
+        register: {
+            type: UserType,
+            args: {
+                name: { type: GraphQLString},
+                email: { type: GraphQLString},
+                password: { type: GraphQLString},
+                password2: { type: GraphQLString}
+            },
+            resolve(parent, args){
+                let status = {
+                    status: ''
+                };
+
+                if(authController.register({...args})){
+                    status.status = 'success'
+                }else {
+                    status.status = 'failure';
+                }
+
+                return status; 
+            }
+        },
+        login: {
+            type: UserType,
+            args: {
+                email: { type: GraphQLString },
+                password: { type: GraphQLString }
+            },
+            resolve(parent, args){
+                let status = {
+                    status: ''
+                }
+
+                if(authController.login({...args})){
+                    status.status = 'success';
+                }else {
+                    status.status = 'failure';
+                }
+
+                return status;
+            }
         }
     }
 })
