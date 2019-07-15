@@ -3,6 +3,25 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 
+async function signKey(args){
+    let { email, password } = args;
+
+    const user = await User.find({
+        email: email
+    });
+
+    if(user.length > 0){
+        const match = await bcrypt.compare(password, user[0].password);
+            if(match){
+                return jwt.sign({...args}, process.env.JWT_SECRET, { expiresIn: '1d' });
+                
+            }else{
+                console.log("Password or account are incorrect!");
+            return "nada";
+        }
+    }
+}
+
 class Auth {
 
     static register(args) {
@@ -55,31 +74,6 @@ class Auth {
         
     }
 
-    static login(args) {
-        let { email, password } = args;
-
-        
-        User.find({
-            email: email
-        }, (err, data) => {
-            if(err) throw err;
-            if(data.length > 0){
-                bcrypt.compare(data.password, password, (err, res) => {
-                    if (res){
-                        let token = jwt.sign(...args, process.env.JWT_SECRET, { expiresIn: '1d'});
-                        console.log(token);
-
-                    }else {
-                        console.log("Password or account are incorrect!");
-                        return "nada";
-                    }
-                })
-            }else {
-                console.log("user do not exist found");
-            }
-        })
-    }
-
 }
 
-module.exports = Auth;
+module.exports = {Auth, signKey};

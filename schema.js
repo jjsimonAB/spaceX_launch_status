@@ -6,7 +6,7 @@ const { GraphQLObjectType,
         GraphQLSchema,
 } = require('graphql');
 
-const authController = require('./constrollers/auth');
+const {signKey} = require('./constrollers/auth');
 
 const axios = require('axios');
 
@@ -19,7 +19,8 @@ const UserType = new GraphQLObjectType({
         name: { type: GraphQLString },
         email: { type: GraphQLString},
         password: {type: GraphQLString},
-        status: {type: GraphQLString}
+        status: {type: GraphQLString},
+        token: { type: GraphQLString }
     })
 })
 
@@ -112,18 +113,10 @@ const RootQuery = new GraphQLObjectType({
                 email: { type: GraphQLString },
                 password: { type: GraphQLString }
             },
-            resolve(parent, args){
-                let status = {
-                    status: ''
-                }
-
-                if(authController.login({...args})){
-                    status.status = 'success';
-                }else {
-                    status.status = 'failure';
-                }
-
-                return status;
+            async resolve(parent, args, context){
+                let token = await signKey({...args});
+                console.log("on resolve", token);
+                return {token};
             }
         }
     }
